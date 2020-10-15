@@ -127,7 +127,7 @@ freertos_i2c_flag_t freertos_i2c_receive(freertos_i2c_number_t i2c_number, uint8
 	{
 		master_xfer.flags = kI2C_TransferDefaultFlag;
 		master_xfer.slaveAddress = slave_addres;
-		master_xfer.direction = kI2C_Write;
+		master_xfer.direction = kI2C_Read;
 		master_xfer.subaddress = reg_address;
 		master_xfer.subaddressSize = reg_size;
 		master_xfer.data = buffer;
