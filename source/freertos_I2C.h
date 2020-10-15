@@ -12,8 +12,10 @@
 
 typedef enum
 {
-  freertos_i2c0,
-  freertos_i2c1
+  freertos_i2c_0,
+  freertos_i2c_1,
+  freertos_i2c_2,
+  freertos_i2c_3
 } freertos_i2c_number_t;
 
 typedef enum
@@ -36,8 +38,8 @@ typedef struct
 	uint32_t baudrate;
 	freertos_i2c_number_t i2c_number;
 	freertos_i2c_port_t port;
-	uint8_t rx_pin;
-	uint8_t tx_pin;
+	uint8_t scl_pin;
+	uint8_t sda_pin;
 	uint8_t pin_mux;
 } freertos_i2c_config_t;
 
