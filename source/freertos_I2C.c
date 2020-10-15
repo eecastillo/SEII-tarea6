@@ -18,8 +18,8 @@ typedef struct
 {
   uint8_t is_init;
   i2c_master_handle_t fsl_i2c_master_handle;
-  SemaphoreHandle_t mutex_rx_tx;
-  SemaphoreHandle_t tx_rx_sem;
+  SemaphoreHandle_t mutex_sda;
+  SemaphoreHandle_t sda_sem;
 } freertos_i2c_hanlde_t;
 
 static freertos_i2c_hanlde_t freertos_i2c_handles[NUMBER_OF_SERIAL_PORTS] = {0};
@@ -43,9 +43,9 @@ freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config)
 	{
 		if(!freertos_i2c_handles[config.i2c_number].is_init)
 		{
-			freertos_i2c_handles[config.i2c_number].mutex_rx_tx = xSemaphoreCreateMutex();
+			freertos_i2c_handles[config.i2c_number].mutex_sda = xSemaphoreCreateMutex();
 
-			freertos_i2c_handles[config.i2c_number].tx_rx_sem = xSemaphoreCreateBinary();
+			freertos_i2c_handles[config.i2c_number].sda_sem = xSemaphoreCreateBinary();
 
 		  /* Clock Enable */
 			freertos_i2c_enable_port_clock(config.port);
@@ -87,4 +87,33 @@ freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config)
 	}
 
 	return retval;
+}
+
+freertos_i2c_flag_t freertos_i2c_send(freertos_i2c_number_t i2c_number, uint8_t * buffer, uint16_t lenght, uint8_t slave_addres, uint32_t reg_address, uint8_t reg_size)
+{
+	freertos_i2c_flag_t flag = freertos_i2c_fail;
+	i2c_master_transfer_t  master_xfer;
+
+	if(freertos_i2c_handles[i2c_number].is_init)
+	{
+		master_xfer.flags = kI2C_TransferDefaultFlag;
+		master_xfer.slaveAddress = slave_addres;
+		master_xfer.direction = kI2C_Write;
+		master_xfer.subaddress = reg_address;
+		master_xfer.subaddressSize = reg_size;
+		master_xfer.data = buffer;
+		master_xfer.dataSize = lenght;
+
+		xSemaphoreTake(freertos_i2c_handles[i2c_number].mutex_sda, portMAX_DELAY);
+
+		I2C_MasterTransferNonBlocking(freertos_i2c_get_i2c_base(i2c_number), &freertos_i2c_handles[i2c_number].fsl_i2c_master_handle, &master_xfer);
+
+		xSemaphoreTake(freertos_i2c_handles[i2c_number].sda_sem, portMAX_DELAY);
+
+		xSemaphoreGive(freertos_i2c_handles[i2c_number].mutex_sda);
+
+		flag = freertos_i2c_sucess;
+	}
+
+	return flag;
 }
