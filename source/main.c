@@ -103,12 +103,19 @@ void get_readings(void *pvParameters)
 	{
 		gyr_data = get_giroscope();
 		acc_data = get_accelerometer();
+		PRINTF("Data from accelerometer:  X = %d  Y = %d  Z = %d \n", acc_data.x, acc_data.y, acc_data.z );
+		PRINTF("Data from gyroscope:  X = %d  Y = %d  Z = %d \n", gyr_data.x, gyr_data.y, gyr_data.z );
 		vTaskDelayUntil( &xLastWakeTime, xfactor );
 	}
 }
 void start_system(void *pvParameters)
 {
-
+	uint8_t sucess = freertos_i2c_sucess;
+	sucess = BMI160_init();
+	if(freertos_i2c_sucess == sucess)
+	{
+		PRINTF("BMI160 configured\n");
+	}
 	vTaskSuspend(NULL);
 }
 
