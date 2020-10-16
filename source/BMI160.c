@@ -10,6 +10,9 @@ static freertos_i2c_config_t bmi160_config;
 
 freertos_i2c_flag_t  BMI160_init(void)
 {
+	TickType_t  xLastWakeTime = xTaskGetTickCount();
+		TickType_t   xfactor = pdMS_TO_TICKS(5000);
+
 	freertos_i2c_flag_t status = freertos_i2c_fail;
 	bmi160_config.baudrate = BAUDRATE;
 	bmi160_config.i2c_number = freertos_i2c_0;
@@ -32,7 +35,7 @@ freertos_i2c_flag_t  BMI160_init(void)
 	    {
 	        PRINTF("I2C master: error during write transaction, %d", status);
 	    }
-		//vTaskDelay(pdMS_TO_TICKS(I2C_DELAY));
+	    vTaskDelayUntil(&xLastWakeTime,xfactor);
 		if(freertos_i2c_fail != status)
 		{
 			status = freertos_i2c_send(bmi160_config.i2c_number, &gyro_normal , 1, SLAVE_ADRESS, CMD_REGISTER, 1);

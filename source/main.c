@@ -79,12 +79,7 @@ int main(void) {
 		PRINTF("Failed to create task");
 		while (1);
 	}
-    if (xTaskCreate(get_readings, "BMI_160_read", configMINIMAL_STACK_SIZE + 100, NULL, BMI160_task_PRIORITY, NULL) !=
-		pdPASS)
-	{
-		PRINTF("Failed to create task");
-		while (1);
-	}
+
 	vTaskStartScheduler();
     for(;;){}
     return 0 ;
@@ -115,6 +110,12 @@ void start_system(void *pvParameters)
 	if(freertos_i2c_sucess == sucess)
 	{
 		PRINTF("BMI160 configured\n");
+	}
+	if (xTaskCreate(get_readings, "BMI_160_read", configMINIMAL_STACK_SIZE + 100, NULL, BMI160_task_PRIORITY, NULL) !=
+		pdPASS)
+	{
+		PRINTF("Failed to create task");
+		while (1);
 	}
 	vTaskSuspend(NULL);
 }
