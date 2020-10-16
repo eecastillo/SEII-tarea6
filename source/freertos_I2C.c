@@ -147,3 +147,24 @@ freertos_i2c_flag_t freertos_i2c_receive(freertos_i2c_number_t i2c_number, uint8
 	return flag;
 }
 
+static inline void freertos_i2c_enable_clock(freertos_i2c_port_t port)
+{
+	switch(port)
+	{
+    case freertos_i2c_portA:
+      CLOCK_EnableClock(kCLOCK_PortA);
+      break;
+    case freertos_i2c_portB:
+      CLOCK_EnableClock(kCLOCK_PortB);
+      break;
+    case freertos_i2c_portC:
+      CLOCK_EnableClock(kCLOCK_PortC);
+      break;
+    case freertos_i2c_portD:
+      CLOCK_EnableClock(kCLOCK_PortD);
+      break;
+    case freertos_i2c_portE:
+      CLOCK_EnableClock(kCLOCK_PortE);
+      break;
+	}
+}
