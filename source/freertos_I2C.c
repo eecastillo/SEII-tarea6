@@ -236,3 +236,28 @@ static inline I2C_Type * freertos_i2c_get_i2c_base(freertos_i2c_number_t i2c_num
 
 	return retval;
 }
+
+static void fsl_i2c_callback(I2C_Type *base, uart_handle_t *handle, status_t status, void *userData)
+{
+  BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+  if (kStatus_Success  == status)
+  {
+	switch(base)
+	{
+	case I2C0:
+	      xSemaphoreGiveFromISR(freertos_i2c_handles[freertos_i2c_0].sda_sem, &xHigherPriorityTaskWoken);
+		break;
+	case I2C1:
+	      xSemaphoreGiveFromISR(freertos_i2c_handles[freertos_i2c_1].sda_sem, &xHigherPriorityTaskWoken);
+		break;
+	case I2C2:
+	      xSemaphoreGiveFromISR(freertos_i2c_handles[freertos_i2c_2].sda_sem, &xHigherPriorityTaskWoken);
+		break;
+	case I2C3:
+	      xSemaphoreGiveFromISR(freertos_i2c_handles[freertos_i2c_3].sda_sem, &xHigherPriorityTaskWoken);
+		break;
+	}
+  }
+  portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+}
