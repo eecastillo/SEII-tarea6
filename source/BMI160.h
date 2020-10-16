@@ -30,9 +30,10 @@
 #define GYR_CONF_REG 0x42
 #define ACC_CONG_REG 0x40
 #define SLAVE_ADRESS 0x68
-//Bit 5 y 4 estado de accm bit 3 y 2 estado de Gyro. Ambos normal es 01
-#define	PMU_STATUS 0x03
-#define CMD_REGISTER 0x7E //
+// For PMU normal mode ACC 0x11, for PMU normal mode gyro 0x15
+#define CMD_REGISTER 0x7E
+#define ACC_NORMAL_MODE 0x11
+#define GYR_NORMAL_MODE 0x15
 typedef struct
 {
 	int16_t x;
