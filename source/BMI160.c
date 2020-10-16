@@ -9,7 +9,7 @@
 freertos_i2c_flag_t  BMI160_init(void)
 {
 	freertos_i2c_config_t bmi160_config;
-	feertos_i2c_flag_t status = freertos_isc_fail;
+	freertos_i2c_flag_t status = freertos_i2c_fail;
 	bmi160_config.baudrate = BAUDRATE;
 	bmi160_config.i2c_number = freertos_i2c_0;
 }
