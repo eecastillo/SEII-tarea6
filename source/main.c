@@ -102,13 +102,7 @@ int main(void) {
 
 void BMI160_init(void *pvParameters)
 {
-    /* Set interrupt priorities */
-  /*  I2C_MasterInit(I2C_Type *base, const i2c_master_config_t *masterConfig, uint32_t srcClock_Hz);
-    i2c_rtos_handle_t master_rtos_handle;
-    i2c_master_config_t masterConfig;
-    i2c_master_transfer_t masterXfer;
-    uint32_t sourceClock;
-    status_t status;*/
+
 	vTaskSuspend(NULL);
 }
 
