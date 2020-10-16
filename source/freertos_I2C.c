@@ -39,6 +39,11 @@ freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config)
 	freertos_i2c_flag_t retval = freertos_i2c_fail;
 	i2c_master_config_t fsl_i2c_config;
 
+	const port_pin_config_t config_i2c =
+	{ kPORT_PullUp, kPORT_SlowSlewRate, kPORT_PassiveFilterDisable,
+			kPORT_OpenDrainDisable, kPORT_LowDriveStrength, kPORT_MuxAlt5,
+			kPORT_UnlockRegister};
+
 	if(config.i2c_number < NUMBER_OF_SERIAL_PORTS)
 	{
 		if(!freertos_i2c_handles[config.i2c_number].is_init)
@@ -52,8 +57,8 @@ freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config)
 			freertos_i2c_enable_clock(config.i2c_number);
 
 			/* Port Config */
-			PORT_SetPinMux(freertos_i2c_get_port_base(config.port), config.sda_pin, config.pin_mux);
-			PORT_SetPinMux(freertos_i2c_get_port_base(config.port), config.scl_pin, config.pin_mux);
+			PORT_SetPinConfig(freertos_i2c_get_port_base(config.port), config.sda_pin, &config_i2c);
+			PORT_SetPinConfig(freertos_i2c_get_port_base(config.port), config.scl_pin, &config_i2c);
 
 			I2C_MasterGetDefaultConfig(&fsl_i2c_config);
 			fsl_i2c_config.baudRate_Bps = config.baudrate;

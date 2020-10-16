@@ -12,8 +12,11 @@
 #include "task.h"
 #include <stdio.h>
 #include "freertos_I2C.h"
+#include "fsl_port.h"
 
 #define BAUDRATE 115200
+#define I2C_SCL_PIN 24
+#define I2C_SDA_PIN 25
 
 // Accelerometer Registers
 #define ACC_Z_H 0x17
