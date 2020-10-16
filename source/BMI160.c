@@ -25,7 +25,7 @@ freertos_i2c_flag_t  BMI160_init(void)
 		uint8_t acc_normal = ACC_NORMAL_MODE;
 		uint8_t gyro_normal = GYR_NORMAL_MODE;
 		status = freertos_i2c_send(bmi160_config.i2c_number, &acc_normal , 1, SLAVE_ADRESS, CMD_REGISTER, 1);
-		vTaskDelay(pdMS_TO_TICKS(I2C_DELAY));
+		//vTaskDelay(pdMS_TO_TICKS(I2C_DELAY));
 		if(freertos_i2c_fail != status)
 		{
 			status = freertos_i2c_send(bmi160_config.i2c_number, &gyro_normal , 1, SLAVE_ADRESS, CMD_REGISTER, 1);

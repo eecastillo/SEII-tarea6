@@ -53,7 +53,7 @@
 
 
 #define BMI160_init_PRIORITY (configMAX_PRIORITIES - 1)
-#define master_task_PRIORITY (configMAX_PRIORITIES - 2)
+#define BMI160_task_PRIORITY (configMAX_PRIORITIES - 2)
 
 
 
@@ -79,7 +79,7 @@ int main(void) {
 		PRINTF("Failed to create task");
 		while (1);
 	}
-    if (xTaskCreate(get_readings, "BMI_160_read", configMINIMAL_STACK_SIZE + 100, NULL, BMI160_init_PRIORITY, NULL) !=
+    if (xTaskCreate(get_readings, "BMI_160_read", configMINIMAL_STACK_SIZE + 100, NULL, BMI160_task_PRIORITY, NULL) !=
 		pdPASS)
 	{
 		PRINTF("Failed to create task");
