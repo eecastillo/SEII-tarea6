@@ -37,6 +37,8 @@
 #define CMD_REGISTER 0x7E
 #define ACC_NORMAL_MODE 0x11
 #define GYR_NORMAL_MODE 0x15
+//Chip ID code
+#define CHIP_ID_REG 0x00
 typedef struct
 {
 	int16_t x;
