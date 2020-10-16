@@ -168,3 +168,46 @@ static inline void freertos_i2c_enable_clock(freertos_i2c_port_t port)
       break;
 	}
 }
+
+static inline void freertos_i2c_enable_clock(freertos_i2c_number_t i2c_number)
+{
+	switch(i2c_number)
+	{
+	case freertos_i2c_0:
+		CLOCK_EnableClock(kCLOCK_I2c0);
+		break;
+	case freertos_i2c_1:
+		CLOCK_EnableClock(kCLOCK_I2c1);
+		break;
+	case freertos_i2c_2:
+		CLOCK_EnableClock(kCLOCK_I2c2);
+		break;
+	case freertos_i2c_3:
+		CLOCK_EnableClock(kCLOCK_I2c3);
+		break;
+	}
+}
+
+
+static inline PORT_Type * freertos_i2c_get_port_base(freertos_i2c_port_t port)
+{
+  PORT_Type * port_base = PORTA;
+
+  switch(port)
+  {
+    case freertos_uart_portA:
+      port_base = PORTA;
+      break;
+    case freertos_uart_portB:
+      port_base = PORTB;
+      break;
+    case freertos_uart_portC:
+      port_base = PORTC;
+      break;
+    case freertos_uart_portD:
+      port_base = PORTD;
+      break;
+    case freertos_uart_portE:
+      port_base = PORTE;
+      break;
+  }
