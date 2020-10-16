@@ -213,3 +213,26 @@ static inline PORT_Type * freertos_i2c_get_port_base(freertos_i2c_port_t port)
   }
   return port_base;
 }
+
+static inline I2C_Type * freertos_i2c_get_i2c_base(freertos_i2c_number_t i2c_number)
+{
+	I2C_Type * retval = I2C0;
+
+	switch(i2c_number)
+	{
+	case freertos_i2c_0:
+		retval = I2C0;
+		break;
+	case freertos_i2c_1:
+		retval = I2C1;
+		break;
+	case freertos_i2c_2:
+		retval = I2C2;
+		break;
+	case freertos_i2c_3:
+		retval = I2C3;
+		break;
+	}
+
+	return retval;
+}
