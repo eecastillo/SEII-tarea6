@@ -11,7 +11,7 @@ static freertos_i2c_config_t bmi160_config;
 freertos_i2c_flag_t  BMI160_init(void)
 {
 	TickType_t  xLastWakeTime = xTaskGetTickCount();
-		TickType_t   xfactor = pdMS_TO_TICKS(5000);
+	TickType_t   xfactor = pdMS_TO_TICKS(5000);
 
 	freertos_i2c_flag_t status = freertos_i2c_fail;
 	bmi160_config.baudrate = BAUDRATE;
@@ -28,18 +28,16 @@ freertos_i2c_flag_t  BMI160_init(void)
 	if(freertos_i2c_sucess == status)
 	{
 		status = freertos_i2c_fail;
-		uint8_t acc_normal = ACC_NORMAL_MODE;
-		uint8_t gyro_normal = GYR_NORMAL_MODE;
-		status = freertos_i2c_send(bmi160_config.i2c_number, &acc_normal , 1, SLAVE_ADRESS, CMD_REGISTER, 1);
-	    if (status != kStatus_Success)
-	    {
-	        PRINTF("I2C master: error during write transaction, %d", status);
-	    }
-	    vTaskDelayUntil(&xLastWakeTime,xfactor);
-		if(freertos_i2c_fail != status)
-		{
-			status = freertos_i2c_send(bmi160_config.i2c_number, &gyro_normal , 1, SLAVE_ADRESS, CMD_REGISTER, 1);
-		}
+		uint8_t write[2] = {CMD_REGISTER, 0x00};
+
+		write[1] = ACC_NORMAL_MODE;
+		i2c_multiple_write(SLAVE_ADRESS, write, 2);
+		vTaskDelay(pdMS_TO_TICKS(100));
+
+		write[1] = GYR_NORMAL_MODE;
+		i2c_multiple_write(SLAVE_ADRESS, write, 2);
+		vTaskDelay(pdMS_TO_TICKS(100));		
+
 	}
 	return status;
 }
@@ -47,23 +45,19 @@ bmi160_raw_data_t get_accelerometer(void)
 {
 
 	bmi160_raw_data_t acc_data;
-	uint8_t lsb = 0;
-	uint8_t msb = 0;
+	uint8_t acc[6];
+	uint16_t x = 0;
+	uint16_t y = 0;
+	uint16_t z = 0;
 
-	//Get X_ACC data
-	freertos_i2c_receive(bmi160_config.i2c_number, &lsb, 1, SLAVE_ADRESS, ACC_X_L, 1);
-	freertos_i2c_receive(bmi160_config.i2c_number, &msb, 1, SLAVE_ADRESS, ACC_X_H, 1);
-	acc_data.x = (msb << 8) + lsb;
+	i2c_multiple_read(SLAVE_ADRESS, ACC_X_L, acc, 6);
+	x = acc[0] | acc[1]<<8;
+	y = acc[2] | acc[3]<<8;
+	z = acc[4] | acc[5]<<8;
 
-	//Get Y_ACC data
-	freertos_i2c_receive(bmi160_config.i2c_number, &lsb, 1, SLAVE_ADRESS, ACC_Y_L, 1);
-	freertos_i2c_receive(bmi160_config.i2c_number, &msb, 1, SLAVE_ADRESS, ACC_Y_H, 1);
-	acc_data.y = (msb << 8) + lsb;
-
-	//Get Z_ACC data
-	freertos_i2c_receive(bmi160_config.i2c_number, &lsb, 1, SLAVE_ADRESS, ACC_Z_L, 1);
-	freertos_i2c_receive(bmi160_config.i2c_number, &msb, 1, SLAVE_ADRESS, ACC_Z_H, 1);
-	acc_data.z = (msb << 8) + lsb;
+	acc_data.x = x;
+	acc_data.y = y;
+	acc_data.z = z;
 
 	return acc_data;
 
@@ -72,23 +66,19 @@ bmi160_raw_data_t get_accelerometer(void)
 bmi160_raw_data_t get_giroscope(void)
 {
 	bmi160_raw_data_t gyr_data;
-	uint8_t lsb = 0;
-	uint8_t msb = 0;
+	uint8_t gyr[6];
+	uint16_t x = 0;
+	uint16_t y = 0;
+	uint16_t z = 0;
 
-	//Get X_GYR data
-	freertos_i2c_receive(bmi160_config.i2c_number, &lsb, 1, SLAVE_ADRESS, GYR_X_L, 1);
-	freertos_i2c_receive(bmi160_config.i2c_number, &msb, 1, SLAVE_ADRESS, GYR_X_H, 1);
-	gyr_data.x = (msb << 8) + lsb;
+	i2c_multiple_read(SLAVE_ADRESS, GYR_X_L, gyr, 6);
+	x = gyr[0] | gyr[1]<<8;
+	y = gyr[2] | gyr[3]<<8;
+	z = gyr[4] | gyr[5]<<8;
 
-	//Get Y_GYR data
-	freertos_i2c_receive(bmi160_config.i2c_number, &lsb, 1, SLAVE_ADRESS, GYR_Y_L, 1);
-	freertos_i2c_receive(bmi160_config.i2c_number, &msb, 1, SLAVE_ADRESS, GYR_Y_H, 1);
-	gyr_data.y = (msb << 8) + lsb;
-
-	//Get Z_GYR data
-	freertos_i2c_receive(bmi160_config.i2c_number, &lsb, 1, SLAVE_ADRESS, GYR_Z_L, 1);
-	freertos_i2c_receive(bmi160_config.i2c_number, &msb, 1, SLAVE_ADRESS, GYR_Z_H, 1);
-	gyr_data.z = (msb << 8) + lsb;
+	gyr_data.x = x;
+	gyr_data.y = y;
+	gyr_data.z = z;
 
 	return gyr_data;	
 }
