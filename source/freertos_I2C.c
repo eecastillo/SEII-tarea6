@@ -133,9 +133,9 @@ freertos_i2c_flag_t freertos_i2c_receive(freertos_i2c_number_t i2c_number, uint8
 		master_xfer.data = buffer;
 		master_xfer.dataSize = lenght;
 
-		xSemaphoreTake(freertos_i2c_handles[i2c_number].mutex_rx, portMAX_DELAY);
+		xSemaphoreTake(freertos_i2c_handles[i2c_number].mutex_sda, portMAX_DELAY);
 
-		I2C_MasterTransferNonBlocking(freertos_uart_get_uart_base(i2c_number), &freertos_i2c_handles[i2c_number].fsl_i2c_master_handle, &master_xfer, NULL);
+		I2C_MasterTransferNonBlocking(freertos_i2c_get_i2c_base(i2c_number), &freertos_i2c_handles[i2c_number].fsl_i2c_master_handle, &master_xfer);
 
 		xSemaphoreTake(freertos_i2c_handles[i2c_number].sda_sem, portMAX_DELAY);
 
@@ -147,7 +147,7 @@ freertos_i2c_flag_t freertos_i2c_receive(freertos_i2c_number_t i2c_number, uint8
 	return flag;
 }
 
-static inline void freertos_i2c_enable_clock(freertos_i2c_port_t port)
+static inline void freertos_i2c_enable_port_clock(freertos_i2c_port_t   port)
 {
 	switch(port)
 	{
