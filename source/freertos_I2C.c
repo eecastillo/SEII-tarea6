@@ -195,19 +195,21 @@ static inline PORT_Type * freertos_i2c_get_port_base(freertos_i2c_port_t port)
 
   switch(port)
   {
-    case freertos_uart_portA:
+    case freertos_i2c_portA:
       port_base = PORTA;
       break;
-    case freertos_uart_portB:
+    case freertos_i2c_portB:
       port_base = PORTB;
       break;
-    case freertos_uart_portC:
+    case freertos_i2c_portC:
       port_base = PORTC;
       break;
-    case freertos_uart_portD:
+    case freertos_i2c_portD:
       port_base = PORTD;
       break;
-    case freertos_uart_portE:
+    case freertos_i2c_portE:
       port_base = PORTE;
       break;
   }
+  return port_base;
+}
