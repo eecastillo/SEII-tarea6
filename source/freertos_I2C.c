@@ -12,16 +12,14 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-#define NUMBER_OF_SERIAL_PORTS (4)
+#define NUMBER_OF_SERIAL_PORTS 4
 
 typedef struct
 {
 	uint8_t is_init;
-	I2C_Type *base;                 /*!< I2C base address */
-	i2c_master_handle_t drv_handle; /*!< A handle of the underlying driver, treated as opaque by the RTOS layer */
-	status_t async_status;          /*!< Transactional state of the underlying driver */
-	SemaphoreHandle_t mutex;        /*!< A mutex to lock the handle during a transfer */
-	SemaphoreHandle_t semaphore;    /*!< A semaphore to notify and unblock task when the transfer ends */
+	i2c_master_handle_t i2c_master_handle;
+	SemaphoreHandle_t mutex_sem;
+	SemaphoreHandle_t binary_sem;
 } freertos_i2c_hanlde_t;
 
 static freertos_i2c_hanlde_t freertos_i2c_handles[NUMBER_OF_SERIAL_PORTS] = {0};
@@ -38,6 +36,9 @@ static void fsl_i2c_callback(I2C_Type *base, freertos_i2c_hanlde_t *handle, stat
 
 freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config)
 {
+	freertos_i2c_handles[config.i2c_number].is_init = 0;
+
+
 	freertos_i2c_flag_t retval = freertos_i2c_fail;
 	i2c_master_config_t fsl_i2c_config;
 

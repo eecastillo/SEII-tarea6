@@ -45,9 +45,9 @@ typedef struct
 
 freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config);
 
-freertos_i2c_flag_t freertos_i2c_send(freertos_i2c_number_t i2c_number, uint8_t * buffer, uint16_t lenght, uint8_t slave_addres, uint32_t reg_address, uint8_t reg_size);
+freertos_i2c_flag_t freertos_i2c_send(freertos_i2c_number_t i2c_number, uint8_t * data_write, uint16_t lenght, uint8_t slave_addres, uint32_t reg_address, uint8_t reg_size);
 
-freertos_i2c_flag_t freertos_i2c_receive(freertos_i2c_number_t i2c_number, uint8_t * buffer, uint16_t lenght, uint8_t slave_addres, uint32_t reg_address, uint8_t reg_size);
+freertos_i2c_flag_t freertos_i2c_receive(freertos_i2c_number_t i2c_number, uint8_t * data_read, uint8_t command, uint16_t lenght, uint8_t slave_addres, uint32_t reg_address, uint8_t reg_size);
 
 
 #endif /* FREERTOS_I2C_H_ */
