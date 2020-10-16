@@ -11,7 +11,7 @@ static freertos_i2c_config_t bmi160_config;
 freertos_i2c_flag_t  BMI160_init(void)
 {
 	TickType_t  xLastWakeTime = xTaskGetTickCount();
-	TickType_t   xfactor = pdMS_TO_TICKS(5000);
+	TickType_t   xfactor = pdMS_TO_TICKS(100);
 
 	freertos_i2c_flag_t status = freertos_i2c_fail;
 	bmi160_config.baudrate = BAUDRATE;
@@ -31,12 +31,12 @@ freertos_i2c_flag_t  BMI160_init(void)
 		uint8_t write[2] = {CMD_REGISTER, 0x00};
 
 		write[1] = ACC_NORMAL_MODE;
-		i2c_multiple_write(SLAVE_ADRESS, write, 2);
-		vTaskDelay(pdMS_TO_TICKS(100));
+		freertos_i2c_send(SLAVE_ADRESS, write, 2);
+		vTaskDelayUntil(&xLastWakeTime,xfactor);
 
 		write[1] = GYR_NORMAL_MODE;
-		i2c_multiple_write(SLAVE_ADRESS, write, 2);
-		vTaskDelay(pdMS_TO_TICKS(100));		
+		freertos_i2c_send(SLAVE_ADRESS, write, 2);
+		vTaskDelayUntil(&xLastWakeTime,xfactor);
 
 	}
 	return status;
@@ -50,7 +50,7 @@ bmi160_raw_data_t get_accelerometer(void)
 	uint16_t y = 0;
 	uint16_t z = 0;
 
-	i2c_multiple_read(SLAVE_ADRESS, ACC_X_L, acc, 6);
+	freertos_i2c_receive(SLAVE_ADRESS, ACC_X_L, acc, 6);
 	x = acc[0] | acc[1]<<8;
 	y = acc[2] | acc[3]<<8;
 	z = acc[4] | acc[5]<<8;
@@ -71,7 +71,7 @@ bmi160_raw_data_t get_giroscope(void)
 	uint16_t y = 0;
 	uint16_t z = 0;
 
-	i2c_multiple_read(SLAVE_ADRESS, GYR_X_L, gyr, 6);
+	freertos_i2c_receive(SLAVE_ADRESS, GYR_X_L, gyr, 6);
 	x = gyr[0] | gyr[1]<<8;
 	y = gyr[2] | gyr[3]<<8;
 	z = gyr[4] | gyr[5]<<8;

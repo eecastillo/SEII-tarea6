@@ -88,7 +88,7 @@ int main(void) {
 void get_readings(void *pvParameters)
 {
 	TickType_t xLastWakeTime;
-	TickType_t xfactor = pdMS_TO_TICKS(1000);
+	TickType_t xfactor = pdMS_TO_TICKS(500);
 	// Initialise the xLastWakeTime variable with the current time.
 	xLastWakeTime = xTaskGetTickCount();
 	bmi160_raw_data_t gyr_data;
