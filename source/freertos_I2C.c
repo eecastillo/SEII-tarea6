@@ -16,9 +16,12 @@
 
 typedef struct
 {
-  uint8_t is_init;
-  i2c_master_handle_t fsl_i2c_master_handle;
-  SemaphoreHandle_t mutex_sda;
+	uint8_t is_init;
+	I2C_Type *base;                 /*!< I2C base address */
+	i2c_master_handle_t drv_handle; /*!< A handle of the underlying driver, treated as opaque by the RTOS layer */
+	status_t async_status;          /*!< Transactional state of the underlying driver */
+	SemaphoreHandle_t mutex;        /*!< A mutex to lock the handle during a transfer */
+	SemaphoreHandle_t semaphore;    /*!< A semaphore to notify and unblock task when the transfer ends */
 } freertos_i2c_hanlde_t;
 
 static freertos_i2c_hanlde_t freertos_i2c_handles[NUMBER_OF_SERIAL_PORTS] = {0};
@@ -81,7 +84,7 @@ freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config)
 					break;
 			}
 
-			I2C_MasterTransferCreateHandle(freertos_i2c_get_i2c_base(config.i2c_number), &freertos_i2c_handles[config.i2c_number].fsl_i2c_master_handle, fsl_i2c_callback, NULL);
+			I2C_MasterTransferCreateHandle(freertos_i2c_get_i2c_base(config.i2c_number), &freertos_i2c_handles[config.i2c_number].drv_handle, fsl_i2c_callback, NULL);
 
 			freertos_i2c_handles[config.i2c_number].is_init = 1;
 
@@ -102,8 +105,8 @@ freertos_i2c_flag_t freertos_i2c_send(freertos_i2c_number_t i2c_number, uint8_t 
 		master_xfer.flags = kI2C_TransferDefaultFlag;
 		master_xfer.slaveAddress = slave_addres;
 		master_xfer.direction = kI2C_Write;
-		master_xfer.subaddress = reg_address;
-		master_xfer.subaddressSize = reg_size;
+		master_xfer.subaddress = 0;
+		master_xfer.subaddressSize = 0;
 		master_xfer.data = buffer;
 		master_xfer.dataSize = lenght;
 

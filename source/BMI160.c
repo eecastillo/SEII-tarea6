@@ -19,12 +19,19 @@ freertos_i2c_flag_t  BMI160_init(void)
 	bmi160_config.sda_pin = I2C_SDA_PIN;
 
 	status = freertos_i2c_init(bmi160_config);
+
+
+
 	if(freertos_i2c_sucess == status)
 	{
 		status = freertos_i2c_fail;
 		uint8_t acc_normal = ACC_NORMAL_MODE;
 		uint8_t gyro_normal = GYR_NORMAL_MODE;
 		status = freertos_i2c_send(bmi160_config.i2c_number, &acc_normal , 1, SLAVE_ADRESS, CMD_REGISTER, 1);
+	    if (status != kStatus_Success)
+	    {
+	        PRINTF("I2C master: error during write transaction, %d", status);
+	    }
 		//vTaskDelay(pdMS_TO_TICKS(I2C_DELAY));
 		if(freertos_i2c_fail != status)
 		{
