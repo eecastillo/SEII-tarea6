@@ -74,7 +74,8 @@
 #define CMD_REGISTER 0x7E //
 #define	ACC_PMU_NORMAL_MODE
 
-
+void get_readings(void *pvParameters);
+void start_system(void *pvParameters);
 
 int main(void) {
 
@@ -89,13 +90,13 @@ int main(void) {
 
     PRINTF("Hello World\n");
 
-    if (xTaskCreate(BMI160_init, "BMI160_init", configMINIMAL_STACK_SIZE + 100, NULL, BMI160_init_PRIORITY, NULL) !=
+    if (xTaskCreate(start_system, "BMI160_init", configMINIMAL_STACK_SIZE + 100, NULL, BMI160_init_PRIORITY, NULL) !=
 		pdPASS)
 	{
 		PRINTF("Failed to create task");
 		while (1);
 	}
-    if (xTaskCreate(BMI_160_read, "BMI_160_read", configMINIMAL_STACK_SIZE + 100, NULL, BMI160_init_PRIORITY, NULL) !=
+    if (xTaskCreate(get_readings, "BMI_160_read", configMINIMAL_STACK_SIZE + 100, NULL, BMI160_init_PRIORITY, NULL) !=
 		pdPASS)
 	{
 		PRINTF("Failed to create task");
@@ -104,6 +105,28 @@ int main(void) {
 	vTaskStartScheduler();
     for(;;){}
     return 0 ;
+}
+
+void get_readings(void *pvParameters)
+{
+	TickType_t xLastWakeTime;
+	TickType_t xfactor = pdMS_TO_TICKS(1000);
+	// Initialise the xLastWakeTime variable with the current time.
+	xLastWakeTime = xTaskGetTickCount();
+	bmi160_raw_data_t gyr_data;
+	bmi160_raw_data_t acc_data;
+
+	for( ;; )
+	{
+		gyr_data = get_giroscope();
+		acc_data = get_accelerometer();
+		vTaskDelayUntil( &xLastWakeTime, xfactor );
+	}
+}
+void start_system(void *pvParameters)
+{
+
+	vTaskSuspend(NULL);
 }
 
 

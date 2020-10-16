@@ -6,33 +6,19 @@
  */
 #include "BMI160.h"
 
-bmi160_raw_data_t get_accelerometer()
+freertos_i2c_flag_t  BMI160_init(void)
+{
+	freertos_i2c_config_t bmi160_config;
+	feertos_i2c_flag_t status = freertos_isc_fail;
+	bmi160_config.baudrate = BAUDRATE;
+	bmi160_config.i2c_number = freertos_i2c_0;
+}
+bmi160_raw_data_t get_accelerometer(void)
 {
 }
 
-bmi160_raw_data_t get_giroscope()
+bmi160_raw_data_t get_giroscope(void)
 {
 }
 
-void BMI_160_read(void *pvParameters)
-{
-	TickType_t xLastWakeTime;
-	TickType_t xfactor = pdMS_TO_TICKS(1000);
-	// Initialise the xLastWakeTime variable with the current time.
-	xLastWakeTime = xTaskGetTickCount();
-	bmi160_raw_data_t gyr_data;
-	bmi160_raw_data_t acc_data;
-
-	for( ;; )
-	{
-		gyr_data = get_giroscope();
-		acc_data = get_accelerometer();
-		vTaskDelayUntil( &xLastWakeTime, xfactor );
-	}
-}
-void BMI160_init(void *pvParameters)
-{
-
-	vTaskSuspend(NULL);
-}
 

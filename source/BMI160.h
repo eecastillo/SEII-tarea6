@@ -12,6 +12,8 @@
 #include "task.h"
 #include <stdio.h>
 
+#define BAUDRATE 115200
+
 typedef struct
 {
 	int16_t x;
@@ -19,9 +21,8 @@ typedef struct
 	int16_t z;
 } bmi160_raw_data_t;
 
-void BMI160_init(void *pvParameters);
-void BMI_160_read(void *pvParameters);
-bmi160_raw_data_t get_accelerometer();
-bmi160_raw_data_t get_giroscope();
+freertos_i2c_flag_t  BMI160_init(void);
+bmi160_raw_data_t get_accelerometer(void);
+bmi160_raw_data_t get_giroscope(void);
 
 #endif /* BMI160_H_ */
