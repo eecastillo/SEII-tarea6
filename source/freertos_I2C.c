@@ -36,7 +36,6 @@ static void fsl_i2c_callback(I2C_Type *base, freertos_i2c_hanlde_t *handle, stat
 
 freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config)
 {
-	freertos_i2c_handles[config.i2c_number].is_init = 0;
 
 
 	freertos_i2c_flag_t retval = freertos_i2c_fail;
@@ -51,19 +50,22 @@ freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config)
 	{
 		if(!freertos_i2c_handles[config.i2c_number].is_init)
 		{
-			freertos_i2c_handles[config.i2c_number].mutex_sda = xSemaphoreCreateMutex();
-
+			freertos_i2c_handles[config.i2c_number].is_init = 0;
+			freertos_i2c_handles[config.i2c_number].mutex_sem = xSemaphoreCreateMutex();
+			freertos_i2c_handles[config.i2c_number].binary_sem = xSemaphoreCreateBinary();
 
 		  /* Clock Enable */
 			freertos_i2c_enable_port_clock(config.port);
 			freertos_i2c_enable_clock(config.i2c_number);
+			PORT_SetPinMux(config.port, config.scl_pin, config.pin_mux);
+			PORT_SetPinMux(config.port, config.sda_pin, config.pin_mux);
 
 			/* Port Config */
-			PORT_SetPinConfig(freertos_i2c_get_port_base(config.port), config.sda_pin, &config_i2c);
-			PORT_SetPinConfig(freertos_i2c_get_port_base(config.port), config.scl_pin, &config_i2c);
+			//PORT_SetPinConfig(freertos_i2c_get_port_base(config.port), config.sda_pin, &config_i2c);
+			//PORT_SetPinConfig(freertos_i2c_get_port_base(config.port), config.scl_pin, &config_i2c);
 
 			I2C_MasterGetDefaultConfig(&fsl_i2c_config);
-			fsl_i2c_config.baudRate_Bps = config.baudrate;
+			//fsl_i2c_config.baudRate_Bps = config.baudrate;
 
 			switch(config.i2c_number)
 			{
@@ -96,29 +98,21 @@ freertos_i2c_flag_t freertos_i2c_init(freertos_i2c_config_t config)
 	return retval;
 }
 
-freertos_i2c_flag_t freertos_i2c_send(freertos_i2c_number_t i2c_number, uint8_t * buffer, uint16_t lenght, uint8_t slave_addres, uint32_t reg_address, uint8_t reg_size)
+freertos_i2c_flag_t freertos_i2c_send(uint8_t slave_address, uint8_t *data, uint8_t write_size)
 {
 	freertos_i2c_flag_t flag = freertos_i2c_fail;
 	i2c_master_transfer_t  master_xfer;
 
 	if(freertos_i2c_handles[i2c_number].is_init)
 	{
-		master_xfer.flags = kI2C_TransferDefaultFlag;
-		master_xfer.slaveAddress = slave_addres;
+		master_xfer.slaveAddress = slave_adress;
 		master_xfer.direction = kI2C_Write;
-		master_xfer.subaddress = 0;
 		master_xfer.subaddressSize = 0;
-		master_xfer.data = buffer;
-		master_xfer.dataSize = lenght;
+		master_xfer.data = data;
+		master_xfer.dataSize = write_size;
+		master_xfer.flags = kI2C_TransferDefaultFlag;
 
-		xSemaphoreTake(freertos_i2c_handles[i2c_number].mutex_sda, portMAX_DELAY);
-
-		I2C_MasterTransferNonBlocking(freertos_i2c_get_i2c_base(i2c_number), &freertos_i2c_handles[i2c_number].fsl_i2c_master_handle, &master_xfer);
-
-
-		xSemaphoreGive(freertos_i2c_handles[i2c_number].mutex_sda);
-
-		flag = freertos_i2c_sucess;
+		xSemaphoreTake(freertos_i2c_handles[I2C0].mutex_sem)
 	}
 
 	return flag;
@@ -152,7 +146,7 @@ freertos_i2c_flag_t freertos_i2c_receive(freertos_i2c_number_t i2c_number, uint8
 	return flag;
 }
 
-static inline void freertos_i2c_enable_port_clock(freertos_i2c_port_t   port)
+static inline void freertos_i2c_enable_port_clock(freertos_i2c_port_t port)
 {
 	switch(port)
 	{
